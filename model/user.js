@@ -19,7 +19,6 @@ const userSchrma = new Schema({
     },
     password:{
         type: String,
-        required: true,
         length: {
             min: 6,
             max: 1024
