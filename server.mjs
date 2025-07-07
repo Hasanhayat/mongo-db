@@ -50,7 +50,7 @@ app.get("/api/users", async (req, res) => {
     }
 });
 
-app.post("upload", uploads.array('images',4),  (req, res) => {
+app.post("/api/upload", uploads.array('images',4),  (req, res) => {
     if (!req.files || req.files.length === 0) {
         return res.status(400).json({ message: "No files uploaded" });
     }
@@ -59,6 +59,38 @@ app.post("upload", uploads.array('images',4),  (req, res) => {
     
     res.status(200).json({ message: "Files uploaded successfully", urls: imageUrls });
 });
+
+app.post('/api/single-upload', uploads.single('image'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+    }
+    
+    const imageUrl = req.file.path;
+    
+    res.status(200).json({ message: "File uploaded successfully", url: imageUrl });
+}); 
+
+app.post("/api/product", async (req, res) => {
+    const { name, price, images } = req.body;
+    if (!name || !price || !images || images.length === 0) {
+        return res.status(400).json({ message: "Name, price, and at least one image are required" });
+    }
+    const newProduct = await Product.create(req.body);
+    if (!newProduct) {
+        return res.status(500).json({ message: "Error creating product" });
+    }
+    res.status(201).json({ newProduct: newProduct, message: "Product created successfully" });
+});
+
+app.get("/api/products", async (req, res) => {
+    try {
+        const products = await Product.find();
+        res.status(200).json({ products: products });
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching products", error: error.message });
+    }
+}
+);
   
 
 
